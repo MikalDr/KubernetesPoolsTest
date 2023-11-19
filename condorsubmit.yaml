@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: submit-deployment
+  labels:
+    app: submit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: submit
+  template:
+    metadata:
+      labels:
+        app: submit
+    spec:
+      containers:
+      - name: submit-container
+        image: htcondor/submit:8.9.11-el7
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "1"
+            memory: "10G"
+            ephemeral-storage: "10G"
+          requests:
+            cpu: "1"
+            memory: "10G"
+            ephemeral-storage: "10G"
+        volumeMounts:
+          - name: htcondor-pool-password
+            mountPath: /root/secrets
+            readOnly: true
+      volumes:
+        - name: htcondor-pool-password
+          secret:
+            secretName: htcondor-pool-password
+            items:
+            - key: htcondor-pool-password
+              path: pool_password
